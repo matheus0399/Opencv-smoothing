@@ -54,9 +54,10 @@ for count in range(len(input_imgs)):
     plt.show()
 
     g = cv.GaussianBlur(noise_img, (17, 17), 0)
+    g = np.clip(g, 0, 1)
 
     cv.imshow('{} with low-pass filter'.format(input_imgs[count]), g)
-    cv.imwrite('{}_passa-baixa.jpg'.format(input_imgs[count]), g * 255)
+    cv.imwrite('{}_passa-baixa.png'.format(input_imgs[count]), g * 255)
 
     cv.waitKey(0)
     cv.destroyAllWindows()
