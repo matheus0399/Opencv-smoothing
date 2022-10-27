@@ -53,7 +53,7 @@ for count in range(len(input_imgs)):
     plt.hist(img_hist.ravel(), 256, [0, 256])
     plt.show()
 
-    g = cv.GaussianBlur(noise_img, (15, 15), 0)
+    g = cv.GaussianBlur(src=noise_img, ksize=(9, 9), sigmaX=70)
     g = np.clip(g, 0, 1)
 
     cv.imshow('{} with low-pass filter'.format(input_imgs[count]), g)
@@ -65,18 +65,31 @@ for count in range(len(input_imgs)):
     plt.hist(img_hist.ravel(), 256, [0, 256])
     plt.show()
 
-    ## TRANSFOMADA FOURIER
-    ##titles = ['{} original Fourier'.format(input_imgs[count]), '{} noise Fourier'.format(input_imgs[count]), '{} median Fourier'.format(input_imgs[count]), '{} low-pass Fourier'.format(input_imgs[count])]
-    ##imgs = [img, noise_img, img_median_filter, g]
+    [M, N] = noise_img.shape
+    FT_img = np.fft.fft2(noise_img)
+    n = 2
+    D0 = 70
+    u = np.arange(M)
+    v = np.arange(N)
 
-    ##for i in range(4):
-    ##    f = np.fft.fft2(imgs[i])
-    ##    fshift = np.fft.fftshift(f)
-    ##    magnitude_spectrum = 20*np.log(np.abs(fshift))
-    ##    magnitude_spectrum = np.asarray(magnitude_spectrum, dtype=np.uint8)
-    ##    img_and_magnitude1 = np.concatenate((imgs[i], magnitude_spectrum), axis=1)
+    idx = np.argwhere(u > M / 2)
+    for i in idx:
+        u[i] = u[i] - M
+    idy = np.argwhere(v > N / 2)
+    for i in idy:
+        v[i] = v[i] - N
 
-    ##    cv.imshow(titles[i], img_and_magnitude1)
+    [V, U] = np.meshgrid(v, u)
+    D = np.sqrt(np.power(U, 2) + np.power(V, 2))
+    H = 1. / (1 + np.power((D / D0), (2 * n)))
+    G = H * FT_img
+    butter = np.real(np.fft.ifft2(G))
 
-    ##cv.waitKey(0)
-    ##cv.destroyAllWindows()
+    cv.imshow('{} with butter'.format(input_imgs[count]), butter)
+    cv.imwrite('{}_butterworth.png'.format(input_imgs[count]), butter * 255)
+
+    cv.waitKey(0)
+    cv.destroyAllWindows()
+    img_hist = butter * 255
+    plt.hist(img_hist.ravel(), 256, [0, 256])
+    plt.show()
