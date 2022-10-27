@@ -53,7 +53,7 @@ for count in range(len(input_imgs)):
     plt.hist(img_hist.ravel(), 256, [0, 256])
     plt.show()
 
-    g = cv.GaussianBlur(noise_img, (17, 17), 0)
+    g = cv.GaussianBlur(noise_img, (15, 15), 0)
     g = np.clip(g, 0, 1)
 
     cv.imshow('{} with low-pass filter'.format(input_imgs[count]), g)
