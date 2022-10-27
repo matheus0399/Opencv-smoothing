@@ -53,21 +53,9 @@ for count in range(len(input_imgs)):
     plt.hist(img_hist.ravel(), 256, [0, 256])
     plt.show()
 
-    g = cv.GaussianBlur(src=noise_img, ksize=(9, 9), sigmaX=70)
-    g = np.clip(g, 0, 1)
-
-    cv.imshow('{} with low-pass filter'.format(input_imgs[count]), g)
-    cv.imwrite('{}_passa-baixa.png'.format(input_imgs[count]), g * 255)
-
-    cv.waitKey(0)
-    cv.destroyAllWindows()
-    img_hist = g * 255
-    plt.hist(img_hist.ravel(), 256, [0, 256])
-    plt.show()
-
     [M, N] = noise_img.shape
     FT_img = np.fft.fft2(noise_img)
-    n = 2
+    n = 4
     D0 = 70
     u = np.arange(M)
     v = np.arange(N)
